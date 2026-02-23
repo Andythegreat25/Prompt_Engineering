@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Prompt Guide — Elios Ambiente</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&display=swap" rel="stylesheet">
+<style>
+:root {
+  --navy:#1A2E4A; --navy-mid:#2E5F8A; --accent:#4A90D9; --accent-light:#7FB3E8;
+  --green:#2E7D4F; --green-light:#E8F5EE; --gold:#C9A84C; --gold-light:#F5E6B8;
+  --bg:#F4F7FB; --surface:#fff; --surface2:#EBF3FB; --text:#1A2E4A;
+  --text-mid:#4A6580; --text-light:#8AA5C0; --border:#D0E2F3;
+  --ok:#27AE60; --warn:#F39C12; --danger:#E74C3C;
+  --r:16px; --r-sm:10px;
+  --sh:0 4px 24px rgba(26,46,74,.10); --sh-lg:0 8px 40px rgba(26,46,74,.18);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
+header{background:var(--navy);position:sticky;top:0;z-index:100;box-shadow:0 2px 20px rgba(26,46,74,.3)}
+.hdr{max-width:1280px;margin:0 auto;padding:0 32px;display:flex;align-items:center;justify-content:space-between;height:66px}
+.logo{display:flex;align-items:center;gap:12px}
+.logo-icon{width:38px;height:38px;background:linear-gradient(135deg,var(--accent),var(--green));border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
+.logo-text{font-family:'DM Serif Display',serif;font-size:19px;color:#fff}
+.logo-sub{font-size:10px;color:var(--accent-light);font-weight:400;letter-spacing:.6px;text-transform:uppercase}
+.hdr-right{display:flex;align-items:center;gap:10px}
+.lang-toggle{display:flex;background:rgba(255,255,255,.1);border-radius:8px;overflow:hidden}
+.lang-btn{padding:6px 13px;font-size:12px;font-weight:600;color:rgba(255,255,255,.55);cursor:pointer;border:none;background:transparent;font-family:'DM Sans',sans-serif;transition:all .2s}
+.lang-btn.active{background:var(--accent);color:#fff}
+.reset-btn{font-size:11px;padding:5px 12px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);color:rgba(255,255,255,.7);border-radius:7px;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .2s;display:none}
+.reset-btn.v{display:block}
+.reset-btn:hover{background:rgba(255,255,255,.2);color:#fff}
+
+/* ── QUIZ ──────────────────────────────────────────────── */
+#quiz-screen{min-height:calc(100vh - 66px);display:flex;align-items:center;justify-content:center;padding:32px 16px;background:linear-gradient(160deg,#F4F7FB 60%,#E0EEF8)}
+.qcard{background:var(--surface);border-radius:24px;box-shadow:var(--sh-lg);max-width:640px;width:100%;overflow:hidden}
+.qhero{background:linear-gradient(135deg,var(--navy),#1D3F6B);padding:36px 40px 30px;position:relative;overflow:hidden}
+.qhero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 80% 0%,rgba(74,144,217,.2),transparent 60%)}
+.qbadge{display:inline-flex;align-items:center;gap:6px;background:rgba(74,144,217,.25);border:1px solid rgba(74,144,217,.4);border-radius:20px;padding:4px 12px;font-size:11px;color:var(--accent-light);font-weight:500;margin-bottom:14px;position:relative;letter-spacing:.4px}
+.qhero h1{font-family:'DM Serif Display',serif;font-size:24px;color:#fff;line-height:1.25;margin-bottom:8px;position:relative}
+.qhero h1 em{color:var(--gold-light);font-style:italic}
+.qhero p{color:rgba(255,255,255,.6);font-size:14px;line-height:1.6;font-weight:300;position:relative}
+.qprog{height:4px;background:var(--border)}
+.qprog-fill{height:4px;background:linear-gradient(90deg,var(--accent),var(--green));transition:width .4s ease}
+.qbody{padding:34px 40px 30px}
+.qstep{display:none;animation:fadeIn .3s ease}
+.qstep.active{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.qnum{font-size:11px;font-weight:600;letter-spacing:.8px;text-transform:uppercase;color:var(--text-light);margin-bottom:10px}
+.qtext{font-size:16px;font-weight:600;color:var(--text);line-height:1.4;margin-bottom:22px}
+.qopts{display:flex;flex-direction:column;gap:9px}
+.qopt{display:flex;align-items:center;gap:13px;padding:13px 16px;border:1.5px solid var(--border);border-radius:var(--r-sm);cursor:pointer;transition:all .18s;background:var(--surface)}
+.qopt:hover{border-color:var(--accent);background:var(--surface2)}
+.qopt.sel{border-color:var(--accent);background:var(--surface2);box-shadow:0 0 0 3px rgba(74,144,217,.12)}
+.qopt-ico{width:36px;height:36px;border-radius:9px;background:var(--surface2);display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0;transition:all .18s}
+.qopt.sel .qopt-ico{background:var(--accent)}
+.qopt-lbl{font-size:13.5px;font-weight:500;color:var(--text)}
+.qopt-sub{font-size:11.5px;color:var(--text-light);margin-top:1px;font-weight:400}
+.qnav{display:flex;justify-content:space-between;align-items:center;margin-top:26px;padding-top:18px;border-top:1px solid var(--border)}
+.btn-back{background:none;border:1.5px solid var(--border);color:var(--text-mid);padding:9px 18px;border-radius:var(--r-sm);font-size:13px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .18s}
+.btn-back:hover{border-color:var(--navy);color:var(--navy)}
+.btn-next{background:var(--navy);color:#fff;border:none;padding:10px 22px;border-radius:var(--r-sm);font-size:13.5px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;transition:background .18s}
+.btn-next:hover{background:var(--navy-mid)}
+.btn-next:disabled{opacity:.38;cursor:not-allowed}
+.rcard{text-align:center;padding:4px 0}
+.rico{font-size:50px;margin-bottom:14px}
+.rlevel{display:inline-flex;align-items:center;gap:7px;padding:7px 18px;border-radius:30px;font-size:12.5px;font-weight:700;margin-bottom:14px;letter-spacing:.3px}
+.l0{background:#FEF0F0;color:var(--danger)}
+.l1{background:#FFF8E6;color:#C9A84C}
+.l2{background:#E3F0FF;color:var(--navy-mid)}
+.l3{background:#E8F5EE;color:var(--green)}
+.rtitle{font-family:'DM Serif Display',serif;font-size:21px;color:var(--text);margin-bottom:7px}
+.rdesc{font-size:13.5px;color:var(--text-mid);line-height:1.6;max-width:430px;margin:0 auto 22px}
+.rchips{display:flex;flex-wrap:wrap;gap:7px;justify-content:center;margin-bottom:26px}
+.rchip{background:var(--surface2);border:1px solid var(--border);border-radius:20px;padding:4px 13px;font-size:11.5px;color:var(--navy-mid);font-weight:500}
+.btn-start{background:linear-gradient(135deg,var(--navy),var(--navy-mid));color:#fff;border:none;padding:13px 30px;border-radius:var(--r-sm);font-size:14.5px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .2s;box-shadow:0 4px 16px rgba(26,46,74,.22)}
+.btn-start:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(26,46,74,.28)}
+
+/* ── APP ────────────────────────────────────────────────── */
+#app-screen{display:none}
+.hero{background:linear-gradient(135deg,var(--navy),#1D3F6B);padding:42px 32px 36px;text-align:center;position:relative;overflow:hidden}
+.hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 20% 50%,rgba(74,144,217,.15),transparent 60%),radial-gradient(ellipse at 80% 20%,rgba(46,125,79,.12),transparent 50%)}
+.hero-in{position:relative;z-index:1;max-width:680px;margin:0 auto}
+.hbadge{display:inline-flex;align-items:center;gap:6px;background:rgba(74,144,217,.2);border:1px solid rgba(74,144,217,.4);border-radius:20px;padding:4px 13px;font-size:11px;color:var(--accent-light);font-weight:500;letter-spacing:.4px;margin-bottom:14px}
+.hero h1{font-family:'DM Serif Display',serif;font-size:clamp(22px,4vw,36px);color:#fff;line-height:1.15;margin-bottom:9px}
+.hero h1 em{color:var(--gold-light);font-style:italic}
+.hero p{color:rgba(255,255,255,.6);font-size:14.5px;line-height:1.65;font-weight:300}
+.lvl-pill{display:inline-flex;align-items:center;gap:6px;margin-top:13px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);border-radius:20px;padding:5px 14px;font-size:11.5px;color:rgba(255,255,255,.82);font-weight:500}
+.controls{max-width:1280px;margin:0 auto;padding:26px 32px 0}
+.sbox{position:relative;max-width:510px;margin:0 auto 18px}
+.sbox input{width:100%;padding:12px 46px 12px 44px;border:2px solid var(--border);border-radius:var(--r);font-size:14.5px;font-family:'DM Sans',sans-serif;background:var(--surface);color:var(--text);outline:none;transition:border-color .2s,box-shadow .2s}
+.sbox input:focus{border-color:var(--accent);box-shadow:0 0 0 4px rgba(74,144,217,.12)}
+.sbox input::placeholder{color:var(--text-light)}
+.sico{position:absolute;left:14px;top:50%;transform:translateY(-50%);font-size:16px;pointer-events:none}
+.clr{position:absolute;right:13px;top:50%;transform:translateY(-50%);background:var(--border);border:none;border-radius:50%;width:21px;height:21px;cursor:pointer;font-size:12px;color:var(--text-mid);display:none;align-items:center;justify-content:center}
+.clr.v{display:flex}
+.pills{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:6px}
+.pill{padding:5px 14px;border-radius:20px;font-size:11.5px;font-weight:600;cursor:pointer;border:1.5px solid var(--border);background:var(--surface);color:var(--text-mid);transition:all .15s}
+.pill.active{background:var(--navy);color:#fff;border-color:var(--navy)}
+.pill:hover:not(.active){border-color:var(--accent);color:var(--accent)}
+.main{max-width:1280px;margin:0 auto;padding:22px 32px 80px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:20px}
+.ccard{background:var(--surface);border-radius:var(--r);border:1.5px solid var(--border);overflow:hidden;box-shadow:var(--sh);transition:transform .2s,box-shadow .2s;animation:fadeUp .4s ease both}
+.ccard:hover{transform:translateY(-3px);box-shadow:var(--sh-lg)}
+.ccard.hidden{display:none}
+@keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+.chdr{padding:16px 20px;display:flex;align-items:center;gap:11px;cursor:pointer;user-select:none;background:var(--surface2);border-bottom:1.5px solid var(--border)}
+.cico{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:19px;flex-shrink:0}
+.cinfo{flex:1;min-width:0}
+.ctitle{font-family:'DM Serif Display',serif;font-size:15.5px;color:var(--text);margin-bottom:2px}
+.cdesc{font-size:11px;color:var(--text-light);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ccnt{background:var(--accent);color:#fff;font-size:10px;font-weight:700;padding:2px 7px;border-radius:20px;flex-shrink:0}
+.carr{color:var(--text-light);font-size:11px;flex-shrink:0;transition:transform .2s}
+.chdr.open .carr{transform:rotate(180deg)}
+.plist{display:none}
+.plist.open{display:block}
+.pitem{padding:12px 20px;border-bottom:1px solid var(--border);cursor:pointer;transition:background .15s;position:relative}
+.pitem:last-child{border-bottom:none}
+.pitem:hover{background:var(--surface2)}
+.ptitle{font-size:13px;font-weight:600;color:var(--text);margin-bottom:3px;display:flex;align-items:center;gap:6px;flex-wrap:wrap;padding-right:60px}
+.ptext{font-size:12px;color:var(--text-mid);line-height:1.5;font-weight:300;padding-right:60px}
+.lb{font-size:9px;padding:2px 7px;border-radius:10px;font-weight:700;letter-spacing:.3px;flex-shrink:0}
+.lb-b{background:#E8F5E9;color:#27AE60}
+.lb-m{background:#FFF3CD;color:#C9A84C}
+.lb-a{background:#E3F0FF;color:#2E5F8A}
+.cpybtn{position:absolute;right:12px;top:50%;transform:translateY(-50%);background:var(--navy);color:#fff;border:none;border-radius:7px;padding:4px 10px;font-size:10px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;opacity:0;transition:opacity .15s,background .15s;white-space:nowrap}
+.cpybtn.cp{background:var(--ok)}
+.pitem:hover .cpybtn{opacity:1}
+.overlay{display:none;position:fixed;inset:0;background:rgba(26,46,74,.55);z-index:200;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(4px)}
+.overlay.open{display:flex}
+.modal{background:var(--surface);border-radius:var(--r);max-width:640px;width:100%;box-shadow:var(--sh-lg);overflow:hidden;animation:mIn .25s ease}
+@keyframes mIn{from{opacity:0;transform:scale(.96) translateY(10px)}to{opacity:1;transform:scale(1) translateY(0)}}
+.mhdr{background:var(--navy);padding:18px 22px;display:flex;align-items:center;justify-content:space-between}
+.mhdr h3{font-family:'DM Serif Display',serif;font-size:17px;color:#fff}
+.mclose{background:rgba(255,255,255,.15);border:none;color:#fff;width:28px;height:28px;border-radius:7px;cursor:pointer;font-size:15px;display:flex;align-items:center;justify-content:center}
+.mclose:hover{background:rgba(255,255,255,.25)}
+.mbody{padding:22px}
+.mlbl{font-size:10px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(--text-light);margin-bottom:7px}
+.mprompt{background:var(--bg);border:1.5px solid var(--border);border-radius:var(--r-sm);padding:15px;font-size:13px;line-height:1.75;color:var(--text);white-space:pre-wrap;font-family:'DM Sans',sans-serif;margin-bottom:12px;min-height:80px}
+.mtip{background:var(--surface2);border-left:3px solid var(--accent);border-radius:0 var(--r-sm) var(--r-sm) 0;padding:10px 14px;font-size:12.5px;color:var(--text-mid);line-height:1.5;margin-bottom:18px}
+.macts{display:flex;gap:9px;flex-wrap:wrap}
+.btn-p{flex:1;background:var(--navy);color:#fff;border:none;border-radius:var(--r-sm);padding:10px 16px;font-size:13px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;transition:background .15s;display:flex;align-items:center;justify-content:center;gap:6px;min-width:130px}
+.btn-p:hover{background:var(--navy-mid)}
+.btn-p.ok{background:var(--ok)}
+.btn-s{background:var(--bg);color:var(--text-mid);border:1.5px solid var(--border);border-radius:var(--r-sm);padding:10px 16px;font-size:13px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif}
+.btn-s:hover{background:var(--surface2)}
+.nores{text-align:center;padding:52px 20px;display:none}
+.nores.v{display:block}
+.nores-ico{font-size:36px;margin-bottom:9px}
+.nores h3{font-size:16px;color:var(--text-mid);margin-bottom:4px}
+.nores p{font-size:12.5px;color:var(--text-light)}
+footer{background:var(--navy);color:rgba(255,255,255,.32);text-align:center;padding:16px;font-size:11px}
+@media(max-width:600px){.hdr{padding:0 16px}.hero{padding:32px 16px 26px}.controls,.main{padding-left:16px;padding-right:16px}.grid{grid-template-columns:1fr}.cpybtn{display:none}.qhero,.qbody{padding-left:24px;padding-right:24px}}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="hdr">
+    <div class="logo">
+      <div class="logo-icon">🌿</div>
+      <div>
+        <div class="logo-text">AI Prompt Guide</div>
+        <div class="logo-sub">Elios Ambiente — Strumenti AI per il Team</div>
+      </div>
+    </div>
+    <div class="hdr-right">
+      <button class="reset-btn" id="reset-btn" onclick="resetQuiz()">🔄 <span data-it="Rifai il quiz" data-en="Retake quiz">Rifai il quiz</span></button>
+      <div class="lang-toggle">
+        <button class="lang-btn active" onclick="setLang('it')" id="btn-it">IT</button>
+        <button class="lang-btn" onclick="setLang('en')" id="btn-en">EN</button>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- ═══════════ QUIZ ═══════════ -->
+<div id="quiz-screen">
+  <div class="qcard">
+    <div class="qhero">
+      <div class="qbadge">🤖 <span data-it="Assessment rapido — 3 domande" data-en="Quick assessment — 3 questions">Assessment rapido — 3 domande</span></div>
+      <h1 data-it="Qual è il tuo livello con l'<em>Intelligenza Artificiale</em>?" data-en="What's your level with <em>Artificial Intelligence</em>?">Qual è il tuo livello con l'<em>Intelligenza Artificiale</em>?</h1>
+      <p data-it="Tre domande veloci per mostrarti i prompt più adatti al tuo profilo. Nessuna risposta sbagliata." data-en="Three quick questions to show you the most suitable prompts for your profile. No wrong answers.">Tre domande veloci per mostrarti i prompt più adatti al tuo profilo. Nessuna risposta sbagliata.</p>
+    </div>
+    <div class="qprog"><div class="qprog-fill" id="qpf" style="width:0%"></div></div>
+    <div class="qbody">
+
+      <div class="qstep active" id="s0">
+        <div class="qnum" data-it="DOMANDA 1 DI 3" data-en="QUESTION 1 OF 3">DOMANDA 1 DI 3</div>
+        <div class="qtext" data-it="Con che frequenza usi strumenti AI (ChatGPT, Copilot, Gemini…)?" data-en="How often do you use AI tools (ChatGPT, Copilot, Gemini…)?">Con che frequenza usi strumenti AI (ChatGPT, Copilot, Gemini…)?</div>
+        <div class="qopts">
+          <div class="qopt" onclick="pick(0,0,0)"><div class="qopt-ico">🚫</div><div><div class="qopt-lbl" data-it="Non li uso ancora" data-en="I don't use them yet">Non li uso ancora</div><div class="qopt-sub" data-it="Non ho mai provato o non so da dove iniziare" data-en="Never tried or don't know where to start">Non ho mai provato o non so da dove iniziare</div></div></div>
+          <div class="qopt" onclick="pick(0,1,1)"><div class="qopt-ico">🌱</div><div><div class="qopt-lbl" data-it="Ogni tanto, per cose semplici" data-en="Sometimes, for simple things">Ogni tanto, per cose semplici</div><div class="qopt-sub" data-it="Qualche ricerca o testo, niente di strutturato" data-en="A quick search or text, nothing structured">Qualche ricerca o testo, niente di strutturato</div></div></div>
+          <div class="qopt" onclick="pick(0,2,2)"><div class="qopt-ico">⚡</div><div><div class="qopt-lbl" data-it="Regolarmente, più volte a settimana" data-en="Regularly, multiple times a week">Regolarmente, più volte a settimana</div><div class="qopt-sub" data-it="Fa parte del mio flusso di lavoro" data-en="Part of my workflow">Fa parte del mio flusso di lavoro</div></div></div>
+          <div class="qopt" onclick="pick(0,3,3)"><div class="qopt-ico">🔬</div><div><div class="qopt-lbl" data-it="Ogni giorno, su più attività diverse" data-en="Every day, across multiple tasks">Ogni giorno, su più attività diverse</div><div class="qopt-sub" data-it="Uso più strumenti, ho un approccio sistematico" data-en="Use multiple tools, have a systematic approach">Uso più strumenti, ho un approccio sistematico</div></div></div>
+        </div>
+        <div class="qnav"><div></div><button class="btn-next" id="n0" onclick="next(0)" disabled data-it="Avanti →" data-en="Next →">Avanti →</button></div>
+      </div>
+
+      <div class="qstep" id="s1">
+        <div class="qnum" data-it="DOMANDA 2 DI 3" data-en="QUESTION 2 OF 3">DOMANDA 2 DI 3</div>
+        <div class="qtext" data-it="Per cosa vorresti usare l'AI nel tuo lavoro in Elios?" data-en="What do you want to use AI for in your work at Elios?">Per cosa vorresti usare l'AI nel tuo lavoro in Elios?</div>
+        <div class="qopts">
+          <div class="qopt" onclick="pick(1,0,0)"><div class="qopt-ico">✍️</div><div><div class="qopt-lbl" data-it="Testi, email e comunicazioni" data-en="Texts, emails and communications">Testi, email e comunicazioni</div><div class="qopt-sub" data-it="Scrivere meglio e più velocemente" data-en="Write better and faster">Scrivere meglio e più velocemente</div></div></div>
+          <div class="qopt" onclick="pick(1,1,1)"><div class="qopt-ico">📄</div><div><div class="qopt-lbl" data-it="Documenti tecnici, contratti, normativa" data-en="Technical documents, contracts, regulations">Documenti tecnici, contratti, normativa</div><div class="qopt-sub" data-it="Analisi MUD, AIA, D.Lgs. 152/06, capitolati" data-en="Environmental permits, contracts, D.Lgs. 152/06">Analisi MUD, AIA, D.Lgs. 152/06, capitolati</div></div></div>
+          <div class="qopt" onclick="pick(1,2,1)"><div class="qopt-ico">📊</div><div><div class="qopt-lbl" data-it="Dati, report, Excel" data-en="Data, reports, Excel">Dati, report, Excel</div><div class="qopt-sub" data-it="KPI cantiere, analisi monitoraggio, formule" data-en="Site KPIs, monitoring analysis, formulas">KPI cantiere, analisi monitoraggio, formule</div></div></div>
+          <div class="qopt" onclick="pick(1,3,2)"><div class="qopt-ico">🔧</div><div><div class="qopt-lbl" data-it="Automazione e workflow aziendali" data-en="Automation and business workflows">Automazione e workflow aziendali</div><div class="qopt-sub" data-it="Ridurre lavoro manuale, integrare sistemi" data-en="Reduce manual work, integrate systems">Ridurre lavoro manuale, integrare sistemi</div></div></div>
+        </div>
+        <div class="qnav"><button class="btn-back" onclick="back(1)" data-it="← Indietro" data-en="← Back">← Indietro</button><button class="btn-next" id="n1" onclick="next(1)" disabled data-it="Avanti →" data-en="Next →">Avanti →</button></div>
+      </div>
+
+      <div class="qstep" id="s2">
+        <div class="qnum" data-it="DOMANDA 3 DI 3" data-en="QUESTION 3 OF 3">DOMANDA 3 DI 3</div>
+        <div class="qtext" data-it="Come ti rapporti con l'affidabilità dell'AI?" data-en="How do you feel about AI reliability?">Come ti rapporti con l'affidabilità dell'AI?</div>
+        <div class="qopts">
+          <div class="qopt" onclick="pick(2,0,0)"><div class="qopt-ico">🤔</div><div><div class="qopt-lbl" data-it="Non mi fido, può sbagliare troppo" data-en="I don't trust it, it makes too many mistakes">Non mi fido, può sbagliare troppo</div><div class="qopt-sub" data-it="Voglio capire i limiti prima di usarla sul lavoro" data-en="I need to understand the limits before using it at work">Voglio capire i limiti prima di usarla sul lavoro</div></div></div>
+          <div class="qopt" onclick="pick(2,1,1)"><div class="qopt-ico">🧐</div><div><div class="qopt-lbl" data-it="La uso ma verifico sempre tutto" data-en="I use it but always verify everything">La uso ma verifico sempre tutto</div><div class="qopt-sub" data-it="Buona per bozze, non per decisioni finali" data-en="Good for drafts, not for final decisions">Buona per bozze, non per decisioni finali</div></div></div>
+          <div class="qopt" onclick="pick(2,2,1)"><div class="qopt-ico">✅</div><div><div class="qopt-lbl" data-it="Mi fido su molte attività, so quando verificare" data-en="I trust it for many tasks, I know when to verify">Mi fido su molte attività, so quando verificare</div><div class="qopt-sub" data-it="Ho imparato quali contesti funzionano meglio" data-en="I've learned which contexts work best">Ho imparato quali contesti funzionano meglio</div></div></div>
+          <div class="qopt" onclick="pick(2,3,2)"><div class="qopt-ico">🚀</div><div><div class="qopt-lbl" data-it="È uno strumento di lavoro strutturato per me" data-en="It's a structured work tool for me">È uno strumento di lavoro strutturato per me</div><div class="qopt-sub" data-it="So come fare prompt efficaci, valutare output, iterare" data-en="I know how to prompt effectively, evaluate output, iterate">So come fare prompt efficaci, valutare output, iterare</div></div></div>
+        </div>
+        <div class="qnav"><button class="btn-back" onclick="back(2)" data-it="← Indietro" data-en="← Back">← Indietro</button><button class="btn-next" id="n2" onclick="showResult()" disabled data-it="Vedi il mio profilo →" data-en="See my profile →">Vedi il mio profilo →</button></div>
+      </div>
+
+      <div class="qstep" id="sresult">
+        <div class="rcard">
+          <div class="rico" id="rico"></div>
+          <div class="rlevel" id="rlevel"></div>
+          <div class="rtitle" id="rtitle"></div>
+          <div class="rdesc" id="rdesc"></div>
+          <div class="rchips" id="rchips"></div>
+          <button class="btn-start" onclick="startApp()"><span data-it="Scopri i prompt per te →" data-en="Discover your prompts →">Scopri i prompt per te →</span></button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════ APP ═══════════ -->
+<div id="app-screen">
+  <div class="hero">
+    <div class="hero-in">
+      <div class="hbadge">🌿 Elios Ambiente — AI Prompt Guide</div>
+      <h1><span data-it="Prompt pronti per il tuo" data-en="Prompts ready for your">Prompt pronti per il tuo</span> <em data-it="lavoro quotidiano" data-en="daily work">lavoro quotidiano</em></h1>
+      <p data-it="Copia e adatta con ChatGPT, Copilot, Gemini o Claude. Sostituisci i testi tra [parentesi] con i dettagli reali." data-en="Copy and adapt with ChatGPT, Copilot, Gemini or Claude. Replace text in [brackets] with real details.">Copia e adatta con ChatGPT, Copilot, Gemini o Claude. Sostituisci i testi tra [parentesi] con i dettagli reali.</p>
+      <div class="lvl-pill">📊 <span id="lvl-txt"></span></div>
+    </div>
+  </div>
+  <div class="controls">
+    <div class="sbox">
+      <span class="sico">🔍</span>
+      <input type="text" id="sinput" placeholder="Cerca un prompt…" oninput="doSearch(this)">
+      <button class="clr" id="clrbtn" onclick="clearS()">✕</button>
+    </div>
+    <div class="pills">
+      <button class="pill active" onclick="fltLvl('all',this)" data-it="Tutti" data-en="All">Tutti</button>
+      <button class="pill" onclick="fltLvl('base',this)" data-it="🟢 Base" data-en="🟢 Base">🟢 Base</button>
+      <button class="pill" onclick="fltLvl('mid',this)" data-it="🟡 Intermedio" data-en="🟡 Intermediate">🟡 Intermedio</button>
+      <button class="pill" onclick="fltLvl('adv',this)" data-it="🔵 Avanzato" data-en="🔵 Avanzato">🔵 Avanzato</button>
+    </div>
+  </div>
+  <div class="main">
+    <div class="grid" id="grid"></div>
+    <div class="nores" id="nores"><div class="nores-ico">🔍</div><h3 data-it="Nessun prompt trovato" data-en="No prompts found">Nessun prompt trovato</h3><p data-it="Prova un termine diverso o rimuovi i filtri." data-en="Try a different term or remove filters.">Prova un termine diverso o rimuovi i filtri.</p></div>
+  </div>
+</div>
+
+<div class="overlay" id="modal" onclick="closeM(event)">
+  <div class="modal">
+    <div class="mhdr"><h3 id="mtitle">Prompt</h3><button class="mclose" onclick="closeM()">✕</button></div>
+    <div class="mbody">
+      <div class="mlbl" data-it="PROMPT DA COPIARE" data-en="PROMPT TO COPY">PROMPT DA COPIARE</div>
+      <div class="mprompt" id="mtext"></div>
+      <div class="mtip" id="mtip"></div>
+      <div class="macts">
+        <button class="btn-p" id="copybtn" onclick="copyM()">📋 <span data-it="Copia prompt" data-en="Copy prompt">Copia prompt</span></button>
+        <button class="btn-s" onclick="closeM()"><span data-it="Chiudi" data-en="Close">Chiudi</span></button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer>Elios Ambiente · AI Prompt Guide · <span data-it="Uso interno" data-en="Internal use">Uso interno</span> · 2026</footer>
+
+<script>
+// ═══ DATA ═══════════════════════════════════════════════════════════════════
+const CATS = [
+  { id:'com', icon:'✍️', ibg:'#4A90D9',
+    title:{it:'Testi e Comunicazioni',en:'Texts & Communications'},
+    desc:{it:'Email, offerte, comunicati, lettere formali',en:'Emails, quotes, announcements, formal letters'},
+    prompts:[
+      {lvl:'base',title:{it:'Email professionale',en:'Professional email'},
+       text:{it:'Scrivi un\'email professionale per [nome destinatario, es. cliente / ente pubblico / fornitore] riguardo a [argomento, es. avanzamento lavori di bonifica / sopralluogo / proposta commerciale]. Tono: [formale/cordiale]. Obiettivo: [cosa vuoi ottenere]. Includi: oggetto efficace, corpo conciso, call to action chiara.',en:'Write a professional email to [recipient, e.g. client / public authority / supplier] about [topic, e.g. remediation progress / site visit / commercial proposal]. Tone: [formal/friendly]. Goal: [what you want to achieve]. Include: effective subject, concise body, clear call to action.'},
+       tip:{it:'💡 Sostituisci i testi tra parentesi con i dettagli reali. Più sei specifico, migliore sarà il risultato.',en:'💡 Replace bracketed text with real details. The more specific you are, the better the result.'}},
+      {lvl:'base',title:{it:'Risposta a reclamo cliente',en:'Client complaint response'},
+       text:{it:'Aiutami a rispondere a questo reclamo in modo empatico e professionale. Il reclamo è: [incolla il testo]. La nostra azienda è Elios Ambiente (bonifiche ambientali, gestione rifiuti, cantieri grandi opere). La risposta deve: riconoscere il problema, spiegare le cause se possibile, proporre una soluzione concreta e mantenere la relazione positiva.',en:'Help me respond to this complaint empathetically and professionally. The complaint: [paste text]. Our company is Elios Ambiente (environmental remediation, waste management, major works). The response should: acknowledge the problem, explain causes if possible, propose a concrete solution, maintain a positive relationship.'},
+       tip:{it:'⚠️ Non includere mai ammissioni di responsabilità senza validazione legale.',en:'⚠️ Never include liability admissions without legal validation.'}},
+      {lvl:'mid',title:{it:'Lettera di offerta / preventivo',en:'Offer / quote letter'},
+       text:{it:'Scrivi una lettera di offerta professionale per [cliente/ente] per i seguenti servizi Elios Ambiente: [es. bonifica terreni contaminati da idrocarburi / gestione rifiuti speciali cantiere / assistenza ambientale grandi opere]. Importo: [€ o "da definire"]. Validità: [giorni]. Includi: breve presentazione aziendale (attiva dal 2001, bonifiche e gestione ambientale cantieri), descrizione sintetica del servizio, tempistiche indicative, contatti per accettazione. Tono: professionale e autorevole.',en:'Write a professional offer letter for [client/authority] for these Elios Ambiente services: [e.g. hydrocarbon-contaminated land remediation / site special waste management / major works environmental assistance]. Amount: [€ or TBD]. Validity: [days]. Include: brief company intro (active since 2001, remediation and site environmental management), concise service description, indicative timelines, contact for acceptance. Tone: professional and authoritative.'},
+       tip:{it:'💡 Personalizza con il nome dell\'ente/cliente e riferisci eventuali sopralluoghi o incontri precedenti.',en:'💡 Personalize with the client name and reference any previous site visits or meetings.'}},
+      {lvl:'adv',title:{it:'Ottimizza documento tecnico per non esperti',en:'Adapt technical doc for non-experts'},
+       text:{it:'Sei un esperto di comunicazione tecnica nel settore ambientale italiano. Riformula questo documento tecnico rendendolo comprensibile a [un ente pubblico committente / un cliente privato senza background tecnico / la stampa locale]. Mantieni accuratezza scientifica ma semplifica il linguaggio. Evita acronimi non spiegati. Documento: [incolla]. Obiettivo della comunicazione: [informare / ottenere approvazione / rassicurare la comunità locale]. Lunghezza target: [stessa / ridotta a X righe].',en:'You are a technical communication expert in the Italian environmental sector. Rewrite this technical document to be understandable by [a public commissioning body / a private client without technical background / local press]. Maintain scientific accuracy but simplify language. Avoid unexplained acronyms. Document: [paste]. Communication goal: [inform / get approval / reassure local community]. Target length: [same / reduced to X lines].'},
+       tip:{it:'💡 Il role prompting (assegna un ruolo specialistico all\'AI) migliora significativamente la qualità su task tecnici.',en:'💡 Role prompting (assigning a specialist role to AI) significantly improves quality on technical tasks.'}},
+    ]},
+  { id:'doc', icon:'📄', ibg:'#16A085',
+    title:{it:'Documenti e Normativa Ambientale',en:'Documents & Environmental Regulations'},
+    desc:{it:'Contratti, MUD, AIA, D.Lgs. 152/06, capitolati',en:'Contracts, permits, D.Lgs. 152/06, specifications'},
+    prompts:[
+      {lvl:'base',title:{it:'Sintesi contratto o capitolato',en:'Contract or specification summary'},
+       text:{it:'Analizza questo contratto/capitolato e fornisci: 1) Parti coinvolte e ruoli, 2) Oggetto in 2-3 righe, 3) Obblighi principali di ciascuna parte, 4) Clausole economiche (importi, SAL, scadenze, penali), 5) Durata e condizioni di recesso, 6) Clausole da approfondire (ambiguità o rischio per Elios Ambiente). Testo: [incolla]',en:'Analyze this contract/specification: 1) Parties and roles, 2) Subject in 2-3 lines, 3) Main obligations of each party, 4) Economic clauses (amounts, progress payments, deadlines, penalties), 5) Duration and termination terms, 6) Clauses to investigate (ambiguity or risk for Elios Ambiente). Text: [paste]'},
+       tip:{it:'⚠️ L\'AI NON sostituisce il legale. Usala per orientarti prima di portare il documento al consulente.',en:'⚠️ AI does NOT replace a lawyer. Use it to orient yourself before bringing the document to your advisor.'}},
+      {lvl:'base',title:{it:'Estrai dati da documento tecnico / MUD',en:'Extract data from technical document / MUD'},
+       text:{it:'Dal seguente documento estrai queste informazioni in formato tabella: [es. tipo rifiuto, codice CER, quantità kg, destinazione, data, impianto smaltimento, trasportatore, numero formulario]. Se un campo non è presente scrivi "non trovato". Se ci sono più occorrenze elencale tutte. Documento: [incolla il testo]',en:'From the following document extract this information in table format: [e.g. waste type, EWC code, quantity kg, destination, date, disposal facility, transporter, form number]. Write "not found" for missing fields. List all occurrences. Document: [paste text]'},
+       tip:{it:'💡 Funziona con MUD, FIR, DDT, verbali di caratterizzazione. Copia testo dal PDF con Ctrl+A, Ctrl+C.',en:'💡 Works with waste declarations, transport forms, characterization reports. Copy PDF text with Ctrl+A, Ctrl+C.'}},
+      {lvl:'mid',title:{it:'Sintesi normativa ambientale applicabile',en:'Applicable environmental regulation summary'},
+       text:{it:'Spiegami in modo chiaro e operativo cosa prevede [es. D.Lgs. 152/2006 Parte IV / il D.M. 161/2012 sulle terre da scavo / la normativa AIA / il D.Lgs. 81/2008 in ambito cantieri] riguardo a [aspetto specifico, es. classificazione rifiuti speciali pericolosi / adempimenti MUD annuale / terre e rocce da scavo in cantieri grandi opere]. Voglio capire: obblighi pratici per Elios Ambiente, scadenze, sanzioni. Livello: operativo, non accademico.',en:'Clearly and operationally explain what [e.g. D.Lgs. 152/2006 Part IV / D.M. 161/2012 on excavated earth / IED permit / D.Lgs. 81/2008 for sites] requires regarding [specific aspect, e.g. hazardous special waste classification / annual MUD declaration / soil management in major works]. I want: practical obligations for Elios Ambiente, deadlines, penalties. Level: operational, not academic.'},
+       tip:{it:'⚠️ Normativa soggetta ad aggiornamenti frequenti: verifica sempre con consulente ambientale/legale prima di decisioni operative.',en:'⚠️ Regulations change frequently: always verify with environmental/legal consultant before operational decisions.'}},
+      {lvl:'mid',title:{it:'Confronta due versioni di contratto',en:'Compare two contract versions'},
+       text:{it:'Confronta queste due versioni del documento: 1) Cosa è stato aggiunto nella v2, 2) Cosa è stato rimosso, 3) Cosa è stato modificato (prima/dopo), 4) Modifiche con impatto sostanziale vs formale, 5) Modifiche che potrebbero svantaggiare Elios Ambiente come appaltatore. Versione 1: [incolla]. Versione 2: [incolla].',en:'Compare these two document versions: 1) What was added in v2, 2) What was removed, 3) What was modified (before/after), 4) Substantial vs formal impact changes, 5) Changes that could disadvantage Elios Ambiente as contractor. Version 1: [paste]. Version 2: [paste].'},
+       tip:{it:'💡 Utilissimo per capitolati in negoziazione con stazioni appaltanti pubbliche o grandi clienti privati.',en:'💡 Very useful for specifications under negotiation with public contracting authorities or large private clients.'}},
+      {lvl:'adv',title:{it:'Analisi rischi normativi di cantiere',en:'Site regulatory risk analysis'},
+       text:{it:'Sei un consulente esperto di normativa ambientale italiana (D.Lgs. 152/06, D.Lgs. 81/08, normativa rifiuti speciali/pericolosi, terre da scavo). Analizza i principali rischi di non conformità per questo cantiere: [descrizione cantiere, tipo di attività — bonifica/demolizione/grandi opere, localizzazione, rifiuti prodotti, eventuali contaminanti]. Per ogni rischio: probabilità, impatto, azione preventiva raccomandata, ente di riferimento (ARPA/Comune/Regione). Evidenzia anche gli adempimenti pre-cantiere non ancora completati.',en:'You are an expert consultant in Italian environmental law (D.Lgs. 152/06, D.Lgs. 81/08, special/hazardous waste, excavated earth). Analyze main non-compliance risks for this site: [site description, activity type — remediation/demolition/major works, location, waste produced, any contaminants]. For each risk: probability, impact, recommended preventive action, reference authority (ARPA/Municipality/Region). Also highlight pre-site obligations not yet completed.'},
+       tip:{it:'💡 Usa questo prompt PRIMA di avviare un cantiere complesso. Output eccellente per preparare la riunione di avvio lavori.',en:'💡 Use this prompt BEFORE starting a complex site. Excellent output to prepare the kick-off meeting.'}},
+      {lvl:'adv',title:{it:'Genera checklist adempimenti ambientali',en:'Generate environmental compliance checklist'},
+       text:{it:'Crea una checklist operativa completa per [tipo attività: es. avvio cantiere bonifica sito contaminato da idrocarburi / gestione e trasporto rifiuti speciali pericolosi / demolizione con presenza amianto]. Organizza per: fase (pre-cantiere / in corso / post), ente destinatario (ARPA, Comune, Regione, Albo Gestori Ambientali, ASL), scadenza tipica, documento da produrre, responsabile interno Elios. Normativa di riferimento: D.Lgs. 152/06, D.Lgs. 81/08 e ss.mm.ii.',en:'Create a complete operational checklist for [activity type: e.g. start of hydrocarbon-contaminated site remediation / hazardous special waste management and transport / demolition with asbestos presence]. Organize by: phase (pre-site / ongoing / post), target authority (ARPA, Municipality, Region, Waste Managers Register, ASL), typical deadline, document to produce, Elios internal responsible. Reference: D.Lgs. 152/06, D.Lgs. 81/08.'},
+       tip:{it:'💡 Verifica con il tuo RSPP/consulente ambientale prima dell\'uso operativo. Ottima base di partenza standardizzabile.',en:'💡 Verify with your safety/environmental consultant before operational use. Great standardizable starting point.'}},
+    ]},
+  { id:'dati', icon:'📊', ibg:'#C9A84C',
+    title:{it:'Analisi Dati e Report',en:'Data Analysis & Reports'},
+    desc:{it:'Excel, KPI cantiere, monitoraggio ambientale',en:'Excel, site KPIs, environmental monitoring'},
+    prompts:[
+      {lvl:'base',title:{it:'Formula Excel per gestione dati cantiere',en:'Excel formula for site data management'},
+       text:{it:'Ho un foglio Excel con queste colonne: [es. Data, Cantiere, Tipo rifiuto, Codice CER, Quantità (kg), Destinazione, Stato]. Voglio ottenere: [es. totale rifiuti per cantiere / conteggio per tipo / media mensile / evidenzia valori oltre soglia]. Dimmi la formula esatta, in quale cella inserirla e come funziona. Versione Excel: [365 / 2019 / 2016].',en:'I have an Excel sheet with these columns: [e.g. Date, Site, Waste type, EWC code, Quantity (kg), Destination, Status]. I want to: [e.g. total waste per site / count by type / monthly average / highlight values above threshold]. Give me the exact formula, where to enter it and how it works. Excel version: [365 / 2019 / 2016].'},
+       tip:{it:'💡 Specifica la versione Excel: XLOOKUP e LET non sono disponibili su versioni precedenti al 2019.',en:'💡 Specify Excel version: XLOOKUP and LET are not available on versions before 2019.'}},
+      {lvl:'base',title:{it:'Interpreta dati di monitoraggio ambientale',en:'Interpret environmental monitoring data'},
+       text:{it:'Analizza questi dati di monitoraggio ambientale e dimmi cosa è importante notare: [incolla i dati]. Voglio capire: valori fuori norma rispetto ai limiti di legge [es. CSC Tabella 1 D.Lgs. 152/06 colonna A/B], tendenze nel tempo, parametri che richiedono azione urgente, suggerimenti su campionamenti successivi. Tipo di matrice: [acque sotterranee / suolo / emissioni in atmosfera].',en:'Analyze this environmental monitoring data: [paste data]. I want to understand: values outside legal limits [e.g. D.Lgs. 152/06 Table 1 CSC column A/B], trends over time, parameters requiring urgent action, suggestions for follow-up sampling. Matrix type: [groundwater / soil / air emissions].'},
+       tip:{it:'⚠️ Usa come punto di partenza: per decisioni operative su bonifiche consulta sempre il geologo/ingegnere responsabile.',en:'⚠️ Use as starting point: for operational remediation decisions always consult the responsible geologist/engineer.'}},
+      {lvl:'mid',title:{it:'Struttura report ambientale periodico',en:'Structure periodic environmental report'},
+       text:{it:'Aiutami a strutturare un report ambientale [mensile/trimestrale/annuale] per [cliente/ente committente, es. ARPA / cliente privato / management interno]. Attività da rendicontare: [es. avanzamento bonifica, gestione rifiuti cantiere, monitoraggio acque sotterranee]. Dati disponibili: [elenca]. Suggerisci: sezioni e titoli, per ogni sezione quale dato usare e che tipo di visualizzazione (tabella/grafico/mappa), tono e livello tecnico adeguato al destinatario.',en:'Help me structure an [monthly/quarterly/annual] environmental report for [client/authority, e.g. ARPA / private client / internal management]. Activities to report: [e.g. remediation progress, site waste management, groundwater monitoring]. Available data: [list]. Suggest: sections and titles, for each section which data and visualization (table/chart/map), appropriate tone and technical level for recipient.'},
+       tip:{it:'💡 Un report per ARPA ha struttura e livello di dettaglio molto diversi da uno per il management o per un cliente privato.',en:'💡 A report for ARPA has very different structure and detail level than one for management or a private client.'}},
+      {lvl:'adv',title:{it:'Analisi avanzata dati di caratterizzazione sito',en:'Advanced site characterization data analysis'},
+       text:{it:'Sei un geologo/ingegnere ambientale esperto in analisi di rischio sito-specifica (ASTM, RBCA, normativa italiana D.Lgs. 152/06 All. 1 Titolo V). Analizza questi dati di caratterizzazione: [incolla dati]. Sito: [descrizione]. Uso attuale/futuro del suolo: [residenziale/industriale/verde pubblico]. Fornisci: 1) Contaminanti critici e distribuzione spaziale, 2) Confronto con CSC applicabili, 3) Indicazioni preliminari sull\'estensione della contaminazione, 4) Tecnologie di bonifica potenzialmente applicabili con pro/contro specifici per questo sito, 5) Dati aggiuntivi necessari per analisi di rischio completa secondo normativa italiana.',en:'You are an environmental geologist/engineer expert in site-specific risk analysis (ASTM, RBCA, Italian D.Lgs. 152/06 Ann. 1 Title V). Analyze this characterization data: [paste]. Site: [description]. Current/future land use: [residential/industrial/public green]. Provide: 1) Critical contaminants and spatial distribution, 2) Comparison with applicable CSC, 3) Preliminary contamination extent assessment, 4) Potentially applicable remediation technologies with site-specific pros/cons, 5) Additional data needed for complete risk analysis per Italian regulations.'},
+       tip:{it:'💡 Output eccellente come base per presentazione ad ARPA o committente. Richiede sempre validazione del professionista abilitato.',en:'💡 Excellent output as basis for ARPA or client presentation. Always requires validation by a qualified professional.'}},
+      {lvl:'adv',title:{it:'Dashboard KPI cantiere — struttura Excel',en:'Site KPI dashboard — Excel structure'},
+       text:{it:'Progettami la struttura completa di un file Excel per monitorare i KPI di cantiere Elios Ambiente. Tipo cantiere: [bonifica sito contaminato / grandi opere ferroviarie-autostradali / gestione rifiuti industriali]. KPI da tracciare: [es. avanzamento % per fase vs programma, tonnellate rifiuti prodotti vs previsto, costi effettivi vs budget SAL, giorni cantiere effettivi vs contrattuali, non conformità rilevate e chiuse, near miss/incidenti]. Per ogni KPI: formula Excel, soglie RAG (Rosso/Giallo/Verde), grafico consigliato. Struttura: 1 foglio dati input + 1 foglio dashboard automatico.',en:'Design the complete structure of an Excel file for monitoring Elios Ambiente site KPIs. Site type: [contaminated site remediation / railway-highway major works / industrial waste management]. KPIs: [e.g. % progress per phase vs schedule, waste tonnes produced vs planned, actual vs budget costs, actual vs contractual site days, non-conformances raised and closed, near misses/incidents]. For each KPI: Excel formula, RAG thresholds (Red/Yellow/Green), recommended chart. Structure: 1 input data sheet + 1 automatic dashboard sheet.'},
+       tip:{it:'💡 Dopo la struttura, chiedi: "scrivi le formule complete per ogni KPI". Poi chiedi "crea il foglio dashboard con grafici dinamici".',en:'💡 After the structure, ask: "write complete formulas for each KPI". Then "create the dashboard sheet with dynamic charts".'}},
+    ]},
+  { id:'meet', icon:'📅', ibg:'#8B5CF6',
+    title:{it:'Riunioni e Trascrizioni',en:'Meetings & Transcriptions'},
+    desc:{it:'Verbali SAL, riunioni cantiere, follow-up',en:'SAL minutes, site meetings, follow-up'},
+    prompts:[
+      {lvl:'base',title:{it:'Verbale riunione di cantiere',en:'Site meeting minutes'},
+       text:{it:'Trasforma questi appunti in un verbale di riunione di cantiere professionale. Appunti: [incolla]. Il verbale deve includere: data, luogo, partecipanti (se presenti), punti discussi con sintesi, decisioni prese, action items con responsabile e scadenza, prossima riunione. Formato: strutturato e numerato, adatto ad essere firmato dalle parti.',en:'Transform these notes into professional site meeting minutes. Notes: [paste]. Include: date, location, participants (if in notes), points discussed with summary, decisions made, action items with owner and deadline, next meeting. Format: structured and numbered, suitable for signing by parties.'},
+       tip:{it:'💡 Copilot in Teams trascrive automaticamente. Poi usa questo prompt per strutturare la trascrizione grezza.',en:'💡 Copilot in Teams transcribes automatically. Then use this prompt to structure the raw transcript.'}},
+      {lvl:'base',title:{it:'Agenda riunione SAL',en:'SAL progress meeting agenda'},
+       text:{it:'Crea un\'agenda per una riunione SAL (Stato Avanzamento Lavori) di [durata] per il cantiere [nome/tipo]. Partecipanti: [es. DL, RUP, responsabile Elios, subappaltatori]. Obiettivo: aggiornamento avanzamento, gestione criticità, validazione SAL. Includi: slot temporali, responsabile per punto, tipo di discussione (aggiornamento/decisione/azione), punto fisso su sicurezza e non conformità.',en:'Create a SAL progress meeting agenda for [duration] for site [name/type]. Participants: [e.g. works manager, client rep, Elios responsible, subcontractors]. Goal: progress update, issue management, SAL validation. Include: time slots, owner per point, discussion type (update/decision/action), fixed point on safety and non-conformances.'},
+       tip:{it:'💡 Invia l\'agenda 24h prima. Specifica se i partecipanti devono portare documentazione specifica.',en:'💡 Send the agenda 24h before. Specify if participants need to bring specific documentation.'}},
+      {lvl:'mid',title:{it:'Email follow-up riunione tecnica',en:'Technical meeting follow-up email'},
+       text:{it:'Scrivi una email di follow-up post-riunione tecnica da questi appunti: [incolla]. L\'email deve: riassumere brevemente i punti trattati, elencare chiaramente gli action items (chi fa cosa entro quando), segnalare criticità irrisolte, indicare la prossima scadenza o riunione. Destinatari: [es. DL e RUP committente + team interno Elios]. Tono: professionale e diretto.',en:'Write a post technical meeting follow-up email from these notes: [paste]. Email should: briefly summarize points discussed, clearly list action items (who does what by when), flag unresolved issues, indicate next deadline or meeting. Recipients: [e.g. works manager, client rep + internal Elios team]. Tone: professional and direct.'},
+       tip:{it:'💡 In cantieri grandi opere il follow-up scritto è fondamentale: le responsabilità devono essere tracciate per tutelarsi in caso di contenzioso.',en:'💡 In major works sites written follow-up is critical: responsibilities must be tracked to protect against disputes.'}},
+      {lvl:'adv',title:{it:'Analisi pattern criticità da verbali multipli',en:'Issue pattern analysis from multiple minutes'},
+       text:{it:'Sei un project manager senior esperto in cantieri di bonifica ambientale e grandi opere infrastrutturali. Analizza questi verbali di riunione in sequenza cronologica e identifica: 1) Criticità ricorrenti (cosa si ripete tra un verbale e l\'altro), 2) Action items non chiusi tra una riunione e la successiva, 3) Rischi emergenti non ancora affrontati formalmente, 4) Responsabili con più azioni aperte, 5) Raccomandazioni specifiche per le prossime riunioni e per la gestione del cantiere. Verbali: [incolla in ordine cronologico].',en:'You are a senior project manager expert in environmental remediation and major infrastructure works. Analyze these meeting minutes chronologically: 1) Recurring issues (what repeats across minutes), 2) Action items not closed between meetings, 3) Emerging risks not yet formally addressed, 4) Owners with most open actions, 5) Specific recommendations for upcoming meetings and site management. Minutes: [paste in chronological order].'},
+       tip:{it:'💡 Tecnica potente: alimenta l\'AI con 4-8 verbali consecutivi. Ottieni una visione d\'insieme che sarebbe difficile fare manualmente.',en:'💡 Powerful technique: feed AI with 4-8 consecutive minutes. Get an overview that would be hard to do manually.'}},
+    ]},
+  { id:'pm', icon:'🗂️', ibg:'#E74C3C',
+    title:{it:'Project Management e Organizzazione',en:'Project Management & Organization'},
+    desc:{it:'Pianificazione cantiere, rischi, varianti, multi-sito',en:'Site planning, risks, variations, multi-site'},
+    prompts:[
+      {lvl:'base',title:{it:'Break down fasi di cantiere',en:'Site phases breakdown'},
+       text:{it:'Ho un cantiere di [tipo: es. bonifica sito contaminato da idrocarburi / rimozione e smaltimento amianto / gestione ambientale cantiere ferroviario] della durata stimata di [X mesi]. Aiutami a: suddividerlo in fasi e task principali, stimare la durata di ogni fase, identificare dipendenze critiche tra task, suggerire l\'ordine ottimale considerando autorizzazioni necessarie, stagionalità, disponibilità mezzi e personale.',en:'I have a [type: e.g. hydrocarbon-contaminated site remediation / asbestos removal and disposal / railway site environmental management] site with estimated duration of [X months]. Help me: break it into main phases and tasks, estimate each phase duration, identify critical dependencies, suggest optimal order considering required permits, seasonality, equipment and staff availability.'},
+       tip:{it:'💡 Ottimo punto di partenza per impostare un Gantt su Excel o MS Project. Poi chiedi all\'AI di formattarlo come tabella esportabile.',en:'💡 Great starting point for a Gantt in Excel or MS Project. Then ask AI to format it as an exportable table.'}},
+      {lvl:'mid',title:{it:'Analisi rischi cantiere',en:'Site risk analysis'},
+       text:{it:'Analizza i rischi principali per questo cantiere: [descrizione, tipo attività, localizzazione, durata, rifiuti prodotti]. Per ogni rischio identifica: categoria (tecnico / normativo / ambientale / economico / sicurezza), probabilità (alta/media/bassa), impatto (alto/medio/basso), piano di mitigazione specifico, owner. Organizza per priorità decrescente (probabilità × impatto). Suggerisci anche 2-3 rischi specifici del settore bonifiche/grandi opere che potrei aver sottovalutato.',en:'Analyze main risks for this site: [description, activity type, location, duration, waste produced]. For each risk: category (technical / regulatory / environmental / economic / safety), probability (high/medium/low), impact (high/medium/low), specific mitigation plan, owner. Organize by decreasing priority (probability × impact). Also suggest 2-3 risks specific to remediation/major works sector I may have underestimated.'},
+       tip:{it:'💡 "Suggerisci rischi che potrei aver sottovalutato" è la parte più preziosa — l\'AI ha esperienza su casistiche di settore non ovvie.',en:'💡 "Suggest risks I may have underestimated" is most valuable — AI has experience on non-obvious sector-specific cases.'}},
+      {lvl:'adv',title:{it:'Processo gestione varianti in corso d\'opera',en:'Variation management process'},
+       text:{it:'Sei un project manager senior specializzato in appalti pubblici e lavori ambientali in Italia. Per il cantiere [descrizione], struttura un processo per gestire le varianti in corso d\'opera: 1) Flusso di identificazione e segnalazione (chi, come, entro quanto), 2) Template richiesta formale variante al committente/RUP, 3) Criteri per classificare la variante (compensativa/migliorativa/per cause impreviste ex art. 106 D.Lgs. 50/2016 o D.Lgs. 36/2023), 4) Documentazione minima per tutela legale di Elios Ambiente, 5) Procedura di approvazione e aggiornamento contrattuale.',en:'You are a senior project manager specialized in Italian public procurement and environmental works. For site [description], structure a variation management process: 1) Identification and reporting flow (who, how, by when), 2) Formal variation request template to client/RUP, 3) Classification criteria (compensatory/improvement/unforeseen causes ex art. 106 D.Lgs. 50/2016 or D.Lgs. 36/2023), 4) Minimum documentation for Elios Ambiente legal protection, 5) Approval procedure and contractual update.'},
+       tip:{it:'💡 Le varianti sono uno dei principali contenziosi nel settore appalti. Un processo documentato protegge legalmente Elios Ambiente.',en:'💡 Variations are one of the main disputes in procurement. A documented process legally protects Elios Ambiente.'}},
+      {lvl:'adv',title:{it:'Ottimizza allocazione risorse multi-cantiere',en:'Multi-site resource allocation optimization'},
+       text:{it:'Gestisco [N] cantieri contemporaneamente con queste risorse condivise: [elenca: mezzi chiave, personale specializzato, attrezzature specifiche]. I cantieri hanno queste caratteristiche e scadenze: [cantiere A: tipo, fase attuale, deadline critica; cantiere B: …]. Analizza: colli di bottiglia nell\'allocazione attuale, redistribuzione ottimale delle risorse, cantieri a rischio di ritardo contrattuale, criteri di prioritizzazione in caso di conflitti. Obiettivo: massimizzare avanzamento complessivo rispettando le scadenze contrattuali critiche e i requisiti normativi ambientali.',en:'I manage [N] simultaneous sites with these shared resources: [list: key equipment, specialist staff, specific tools]. Sites have these characteristics and deadlines: [site A: type, current phase, critical deadline; site B: …]. Analyze: bottlenecks in current allocation, optimal resource redistribution, sites at risk of contractual delay, prioritization criteria for conflicts. Goal: maximize overall progress while meeting critical contractual deadlines and environmental regulatory requirements.'},
+       tip:{it:'💡 Fornisci dati strutturati (anche tabellari) — l\'AI analizza meglio input organizzati. Poi chiedi "genera un piano settimanale di allocazione".',en:'💡 Provide structured data (even tabular) — AI analyzes organized inputs better. Then ask "generate a weekly allocation plan".'}},
+    ]},
+  { id:'ric', icon:'🔍', ibg:'#2E7D4F',
+    title:{it:'Ricerca e Sintesi',en:'Research & Synthesis'},
+    desc:{it:'Tecnologie bonifica, bandi, analisi settore',en:'Remediation tech, tenders, sector analysis'},
+    prompts:[
+      {lvl:'base',title:{it:'Ricerca su tecnologia di bonifica',en:'Remediation technology research'},
+       text:{it:'Forniscimi una panoramica su [tecnologia: es. soil washing / bioventing / estrazione multifase / pump and treat / stabilizzazione in situ / elettrocinetica] per bonifica di [tipo contaminazione: idrocarburi C>12 / metalli pesanti / solventi clorurati / PFAS / amianto nel suolo]. Includi: principio di funzionamento, condizioni di applicabilità, pro e contro vs tecnologie alternative, ordine di grandezza costi (€/t o €/m3), normativa italiana di riferimento.',en:'Give me an overview of [technology: e.g. soil washing / bioventing / multiphase extraction / pump and treat / in-situ stabilization / electrokinetics] for remediation of [contamination type: C>12 hydrocarbons / heavy metals / chlorinated solvents / PFAS / asbestos in soil]. Include: operating principle, applicability conditions, pros and cons vs alternative technologies, cost order of magnitude (€/t or €/m3), Italian regulatory reference.'},
+       tip:{it:'💡 Utile per preparare una presentazione tecnica al committente o per valutare alternative in fase progettuale.',en:'💡 Useful for preparing a technical presentation to the client or evaluating alternatives during design phase.'}},
+      {lvl:'mid',title:{it:'Analisi bando di gara',en:'Tender notice analysis'},
+       text:{it:'Analizza questo bando di gara e dimmi: 1) Oggetto e tipologia (lavori/servizi/forniture), 2) Requisiti di partecipazione (fatturato minimo, categorie SOA richieste, certificazioni — es. ISO 14001, OHSAS 18001), 3) Criteri di aggiudicazione e pesi (prezzo/qualità), 4) Elementi tecnici su cui puntare nell\'offerta, 5) Clausole sfavorevoli o rischi da valutare, 6) Scadenze chiave. Valuta se Elios Ambiente (bonifiche ambientali, grandi opere infrastrutturali, gestione rifiuti speciali, sede Piacenza, attiva dal 2001) è potenzialmente idonea. Bando: [incolla o descrivi].',en:'Analyze this tender notice: 1) Subject and type (works/services/supplies), 2) Participation requirements (minimum turnover, required SOA categories, certifications — e.g. ISO 14001, OHSAS 18001), 3) Award criteria and weights (price/quality), 4) Technical elements to focus on in the bid, 5) Unfavorable clauses or risks, 6) Key deadlines. Assess if Elios Ambiente (environmental remediation, major infrastructure works, special waste management, Piacenza, active since 2001) is potentially eligible. Tender: [paste or describe].'},
+       tip:{it:'⚠️ Verifica con responsabile tecnico e legale prima di decidere se partecipare. L\'AI può fare errori su dettagli normativi specifici.',en:'⚠️ Verify with technical and legal responsible before deciding to participate. AI can make mistakes on specific regulatory details.'}},
+      {lvl:'adv',title:{it:'Analisi competitiva settore bonifica ambientale',en:'Environmental remediation sector competitive analysis'},
+       text:{it:'Sei un analista di business specializzato nel mercato italiano delle bonifiche ambientali e dei servizi ambientali per grandi opere. Analizza il posizionamento competitivo di un\'azienda come Elios Ambiente (fondata 2001, Piacenza, settori: bonifiche e risanamento siti contaminati, riqualificazione aree industriali dismesse, gestione ambientale cantieri grandi opere infrastrutturali, gestione rifiuti speciali). Fornisci: 1) Panoramica del mercato italiano attuale, 2) Opportunità legate al PNRR e transizione ecologica, 3) Trend normativi rilevanti (nuova normativa rifiuti EU, economia circolare), 4) 3-5 raccomandazioni strategiche concrete per crescita o diversificazione.',en:'You are a business analyst specialized in the Italian environmental remediation and major works services market. Analyze the competitive positioning of a company like Elios Ambiente (founded 2001, Piacenza, sectors: contaminated site remediation and cleanup, derelict industrial area requalification, major infrastructure works environmental management, special waste management). Provide: 1) Current Italian market overview, 2) PNRR and ecological transition opportunities, 3) Relevant regulatory trends (new EU waste regulations, circular economy), 4) 3-5 concrete strategic recommendations for growth or diversification.'},
+       tip:{it:'💡 Usa l\'output come traccia per discussione strategica interna. L\'AI non conosce i dettagli interni: integra con dati aziendali reali.',en:'💡 Use output as framework for internal strategic discussion. AI doesn\'t know internal details: integrate with real company data.'}},
+    ]},
+  { id:'img', icon:'🖼️', ibg:'#9B59B6',
+    title:{it:'Immagini e Creatività',en:'Images & Creativity'},
+    desc:{it:'Presentazioni, infografiche, comunicazione visiva',en:'Presentations, infographics, visual communication'},
+    prompts:[
+      {lvl:'base',title:{it:'Immagine per presentazione aziendale',en:'Corporate presentation image'},
+       text:{it:'Genera un\'immagine professionale per una presentazione di Elios Ambiente. Soggetto: [es. cantiere di bonifica ambientale con macchinari operativi / paesaggio industriale in riqualificazione / tecnici ambientali in ispezione / area naturalizzata post-bonifica]. Stile: [fotorealistico / illustrazione tecnica]. Colori: verde scuro, blu professionale, grigi neutri. Mood: [tecnico e affidabile / innovativo e sostenibile / istituzionale]. Formato: landscape 16:9, alta risoluzione.',en:'Generate a professional image for an Elios Ambiente presentation. Subject: [e.g. environmental remediation site with operational machinery / industrial landscape under requalification / environmental technicians on inspection / naturalized area post-remediation]. Style: [photorealistic / technical illustration]. Colors: dark green, professional blue, neutral greys. Mood: [technical and reliable / innovative and sustainable / institutional]. Format: landscape 16:9, high resolution.'},
+       tip:{it:'💡 Strumenti consigliati: DALL-E (ChatGPT Plus), Microsoft Designer (gratuito con M365), Adobe Firefly.',en:'💡 Recommended tools: DALL-E (ChatGPT Plus), Microsoft Designer (free with M365), Adobe Firefly.'}},
+      {lvl:'mid',title:{it:'Infografica dati ambientali e di cantiere',en:'Environmental and site data infographic'},
+       text:{it:'Descrivimi come strutturare una infografica per comunicare questi dati: [es. tonnellate rifiuti gestiti nell\'anno, % recupero vs smaltimento, m2 di aree bonificate, numero cantieri attivi, riduzione emissioni]. Target: [cliente/ente pubblico/comunicazione istituzionale/LinkedIn]. Dimmi: layout consigliato, gerarchia visiva delle informazioni, tipo di grafico per ogni dato, palette cromatica coerente con settore ambientale (verde/blu), elementi iconici del settore.',en:'Describe how to structure an infographic for this data: [e.g. waste tonnes managed in the year, % recovery vs disposal, m2 of remediated areas, active sites, emissions reduction]. Target: [client/public authority/institutional communication/LinkedIn]. Tell me: recommended layout, visual hierarchy, chart type for each data point, color palette consistent with environmental sector (green/blue), sector-specific iconic elements.'},
+       tip:{it:'💡 Dopo la struttura usa Canva, PowerPoint o Adobe Express per realizzarla rapidamente. Canva ha template gratuiti di qualità.',en:'💡 After the structure use Canva, PowerPoint or Adobe Express to build it quickly. Canva has quality free templates.'}},
+      {lvl:'adv',title:{it:'Concept comunicazione sostenibilità Elios',en:'Elios sustainability communication concept'},
+       text:{it:'Sei un creative director specializzato in comunicazione ambientale e corporate sustainability nel settore italiano delle bonifiche e servizi ambientali. Crea un concept di comunicazione per posizionare Elios Ambiente come azienda leader responsabile nel settore, per [canale: sito web / brochure istituzionale / profilo LinkedIn / report di sostenibilità]. Includi: messaggio chiave (max 2 righe), tono di voce con 3 aggettivi, palette cromatica con motivazione, 3 idee creative per contenuti/visual specifici per il settore bonifica, claim proposto (breve, memorabile, in italiano).',en:'You are a creative director specialized in environmental communication and corporate sustainability in the Italian remediation and environmental services sector. Create a communication concept to position Elios Ambiente as a responsible sector leader for [channel: website / institutional brochure / LinkedIn profile / sustainability report]. Include: key message (max 2 lines), tone of voice with 3 adjectives, color palette with reasoning, 3 creative content/visual ideas specific to the remediation sector, proposed claim (short, memorable, in Italian).'},
+       tip:{it:'💡 Ottimo per preparare brief per un\'agenzia creativa o sviluppare materiali interni con identità coerente.',en:'💡 Great for preparing a creative agency brief or developing internal materials with consistent identity.'}},
+    ]},
+];
+
+// ═══ QUIZ STATE ══════════════════════════════════════════════════════════════
+let lang='it', ans=[null,null,null], uLvl=1, lvlFlt='all', curPrompt=null;
+const ICONS0=['🚫','🌱','⚡','🔬'];
+const ICONS1=['✍️','📄','📊','🔧'];
+const ICONS2=['🤔','🧐','✅','🚀'];
+const ICO=[ICONS0,ICONS1,ICONS2];
+const PROFILES={
+  it:[
+    {ico:'🌱',badge:'Livello Base',cls:'l0',title:'Benvenuto nell\'AI!',
+     desc:'Hai poca o nessuna esperienza con l\'AI. Ti mostriamo i prompt più semplici e immediati, pensati per chi parte da zero nel settore ambientale.',
+     chips:['Email e testi','Sintesi documenti','Formule Excel','Ricerche rapide']},
+    {ico:'⚡',badge:'Livello Base+',cls:'l1',title:'Buone fondamenta!',
+     desc:'Usi già l\'AI per task semplici. È il momento di espandere: analisi normativa, verbali strutturati, dati di monitoraggio. Vedrai prompt base e intermedi.',
+     chips:['Verbali SAL','Normativa ambientale','Analisi contratti','Report dati']},
+    {ico:'🔧',badge:'Livello Intermedio',cls:'l2',title:'Utente strutturato',
+     desc:'Hai un approccio metodico all\'AI. Ti mostriamo prompt avanzati per ottimizzare workflow, gestire cantieri complessi, analisi normativa approfondita e multi-cantiere.',
+     chips:['Analisi rischi cantiere','Gestione varianti','KPI dashboard','Checklist adempimenti']},
+    {ico:'🚀',badge:'Livello Avanzato',cls:'l3',title:'Utente esperto',
+     desc:'Usi l\'AI in modo sistematico e professionale. Accedi a tutti i prompt, inclusi i più complessi per analisi di rischio sito-specifica, gestione multi-cantiere e compliance avanzata.',
+     chips:['Tutti i prompt','Analisi rischio sito','Strategia competitiva','Automazione workflow']},
+  ],
+  en:[
+    {ico:'🌱',badge:'Base Level',cls:'l0',title:'Welcome to AI!',
+     desc:'You have little or no experience with AI. We show you the simplest prompts designed for beginners in the environmental sector.',
+     chips:['Emails and texts','Document summaries','Excel formulas','Quick research']},
+    {ico:'⚡',badge:'Base+ Level',cls:'l1',title:'Good foundations!',
+     desc:'You already use AI for simple tasks. Time to expand: regulatory analysis, structured minutes, monitoring data. You\'ll see basic and intermediate prompts.',
+     chips:['SAL minutes','Environmental regulations','Contract analysis','Data reports']},
+    {ico:'🔧',badge:'Intermediate Level',cls:'l2',title:'Structured user',
+     desc:'You have a methodical approach to AI. We show advanced prompts to optimize workflows, manage complex sites, in-depth regulatory analysis and multi-site.',
+     chips:['Site risk analysis','Variation management','KPI dashboard','Compliance checklists']},
+    {ico:'🚀',badge:'Advanced Level',cls:'l3',title:'Expert user',
+     desc:'You use AI systematically and professionally. Access all prompts, including the most complex for site-specific risk analysis, multi-site management and advanced compliance.',
+     chips:['All prompts','Site risk analysis','Competitive strategy','Workflow automation']},
+  ]
+};
+
+function pick(step,optIdx,score){
+  ans[step]=score;
+  const el=document.getElementById('s'+step);
+  el.querySelectorAll('.qopt').forEach((o,i)=>{
+    o.classList.toggle('sel',i===optIdx);
+    o.querySelector('.qopt-ico').textContent=i===optIdx?'✓':ICO[step][i];
+  });
+  document.getElementById('n'+step).disabled=false;
+  document.getElementById('qpf').style.width=((step+0.5)/3*100)+'%';
+}
+function next(s){if(ans[s]===null)return;document.getElementById('s'+s).classList.remove('active');document.getElementById('s'+(s+1)).classList.add('active');document.getElementById('qpf').style.width=((s+1.5)/3*100)+'%';}
+function back(s){document.getElementById('s'+s).classList.remove('active');document.getElementById('s'+(s-1)).classList.add('active');document.getElementById('qpf').style.width=((s-0.5)/3*100)+'%';}
+function calcLvl(){const t=ans.reduce((a,b)=>a+(b||0),0);return t<=1?0:t<=4?1:t<=7?2:3;}
+function showResult(){
+  if(ans[2]===null)return;
+  uLvl=calcLvl();
+  const p=PROFILES[lang][uLvl];
+  document.getElementById('rico').textContent=p.ico;
+  const lb=document.getElementById('rlevel');lb.className='rlevel '+p.cls;lb.textContent=p.badge;
+  document.getElementById('rtitle').textContent=p.title;
+  document.getElementById('rdesc').textContent=p.desc;
+  document.getElementById('rchips').innerHTML=p.chips.map(c=>`<span class="rchip">${c}</span>`).join('');
+  document.getElementById('s2').classList.remove('active');
+  document.getElementById('sresult').classList.add('active');
+  document.getElementById('qpf').style.width='100%';
+}
+function startApp(){
+  document.getElementById('quiz-screen').style.display='none';
+  document.getElementById('app-screen').style.display='block';
+  document.getElementById('reset-btn').classList.add('v');
+  const p=PROFILES[lang][uLvl];
+  document.getElementById('lvl-txt').textContent=lang==='it'?`Il tuo livello: ${p.badge} — prompt consigliati attivi`:`Your level: ${p.badge} — recommended prompts active`;
+  renderGrid();
+  // Auto-filter
+  const pls=document.querySelectorAll('.pills .pill');
+  pls.forEach(p=>p.classList.remove('active'));
+  if(uLvl<=1){lvlFlt='base';pls[1].classList.add('active');}
+  else{lvlFlt='all';pls[0].classList.add('active');}
+  applyAll();
+}
+function resetQuiz(){
+  ans=[null,null,null];uLvl=1;lvlFlt='all';
+  document.querySelectorAll('.qstep').forEach(s=>s.classList.remove('active'));
+  document.getElementById('s0').classList.add('active');
+  document.querySelectorAll('.qopt').forEach(o=>o.classList.remove('sel'));
+  document.querySelectorAll('.btn-next').forEach(b=>b.disabled=true);
+  document.querySelectorAll('.qopt-ico').forEach((ico,i)=>{const s=Math.floor(i/4);const oi=i%4;ico.textContent=ICO[s]?ICO[s][oi]:'';});
+  document.getElementById('qpf').style.width='0%';
+  document.getElementById('quiz-screen').style.display='flex';
+  document.getElementById('app-screen').style.display='none';
+  document.getElementById('reset-btn').classList.remove('v');
+}
+
+// ═══ RENDER ══════════════════════════════════════════════════════════════════
+const LBL={base:{it:'Base',en:'Base'},mid:{it:'Intermedio',en:'Intermediate'},adv:{it:'Avanzato',en:'Advanced'}};
+const LCLS={base:'lb-b',mid:'lb-m',adv:'lb-a'};
+function renderGrid(){
+  const g=document.getElementById('grid');g.innerHTML='';
+  CATS.forEach((cat,ci)=>{
+    const c=document.createElement('div');c.className='ccard';c.dataset.catId=cat.id;c.style.animationDelay=(ci*45)+'ms';
+    c.innerHTML=`<div class="chdr open" onclick="togCat('${cat.id}')">
+      <div class="cico" style="background:${cat.ibg}22">${cat.icon}</div>
+      <div class="cinfo"><div class="ctitle">${cat.title[lang]}</div><div class="cdesc">${cat.desc[lang]}</div></div>
+      <span class="ccnt">${cat.prompts.length}</span><span class="carr">▼</span>
+    </div>
+    <div class="plist open" id="pl-${cat.id}">
+      ${cat.prompts.map((p,pi)=>`<div class="pitem" data-lvl="${p.lvl}" data-ci="${ci}" data-pi="${pi}" onclick="openM(${ci},${pi})">
+        <div class="ptitle">${p.title[lang]} <span class="lb ${LCLS[p.lvl]}">${LBL[p.lvl][lang]}</span></div>
+        <div class="ptext">${p.text[lang].substring(0,90)}…</div>
+        <button class="cpybtn" onclick="qCopy(event,${ci},${pi})">${lang==='it'?'📋 Copia':'📋 Copy'}</button>
+      </div>`).join('')}
+    </div>`;
+    g.appendChild(c);
+  });
+}
+function togCat(id){const l=document.getElementById('pl-'+id);const h=l.previousElementSibling;const o=l.classList.toggle('open');h.classList.toggle('open',o);}
+function fltLvl(l,el){lvlFlt=l;document.querySelectorAll('.pills .pill').forEach(p=>p.classList.remove('active'));el.classList.add('active');applyAll();}
+function doSearch(inp){document.getElementById('clrbtn').classList.toggle('v',inp.value.trim().length>0);applyAll();}
+function clearS(){document.getElementById('sinput').value='';document.getElementById('clrbtn').classList.remove('v');applyAll();}
+function applyAll(){
+  const q=(document.getElementById('sinput')?.value||'').toLowerCase().trim();
+  CATS.forEach((cat,ci)=>{
+    let any=false;
+    cat.prompts.forEach((p,pi)=>{
+      const lok=lvlFlt==='all'||p.lvl===lvlFlt;
+      const sok=!q||(p.title.it+p.title.en+p.text.it+p.text.en).toLowerCase().includes(q);
+      const el=document.querySelector(`[data-ci="${ci}"][data-pi="${pi}"]`);
+      if(el){el.style.display=(lok&&sok)?'':'none';if(lok&&sok)any=true;}
+    });
+    const card=document.querySelector(`[data-cat-id="${cat.id}"]`);
+    if(card)card.classList.toggle('hidden',!any);
+  });
+  const vis=document.querySelectorAll('.ccard:not(.hidden)').length;
+  document.getElementById('nores').classList.toggle('v',vis===0);
+}
+function openM(ci,pi){
+  const p=CATS[ci].prompts[pi];curPrompt=p;
+  document.getElementById('mtitle').textContent=p.title[lang];
+  document.getElementById('mtext').textContent=p.text[lang];
+  document.getElementById('mtip').innerHTML=p.tip[lang];
+  const b=document.getElementById('copybtn');b.classList.remove('ok');b.querySelector('span').textContent=lang==='it'?'Copia prompt':'Copy prompt';
+  document.getElementById('modal').classList.add('open');
+}
+function closeM(e){if(!e||e.target===document.getElementById('modal'))document.getElementById('modal').classList.remove('open');}
+function copyM(){
+  if(!curPrompt)return;
+  navigator.clipboard.writeText(curPrompt.text[lang]).then(()=>{
+    const b=document.getElementById('copybtn');b.classList.add('ok');b.querySelector('span').textContent=lang==='it'?'Copiato! ✓':'Copied! ✓';
+    setTimeout(()=>{b.classList.remove('ok');b.querySelector('span').textContent=lang==='it'?'Copia prompt':'Copy prompt';},2000);
+  });
+}
+function qCopy(e,ci,pi){
+  e.stopPropagation();const p=CATS[ci].prompts[pi];
+  navigator.clipboard.writeText(p.text[lang]).then(()=>{
+    const b=e.target;const o=b.textContent;b.textContent='✓';b.classList.add('cp');
+    setTimeout(()=>{b.textContent=o;b.classList.remove('cp');},1500);
+  });
+}
+function setLang(l){
+  lang=l;
+  document.getElementById('btn-it').classList.toggle('active',l==='it');
+  document.getElementById('btn-en').classList.toggle('active',l==='en');
+  document.querySelectorAll('[data-it]').forEach(el=>{
+    if(el.tagName==='H1')el.innerHTML=el.dataset[l];
+    else el.textContent=el.dataset[l];
+  });
+  document.querySelectorAll('.btn-next').forEach(b=>{b.textContent=l==='it'?(b.id==='n2'?'Vedi il mio profilo →':'Avanti →'):(b.id==='n2'?'See my profile →':'Next →');});
+  document.querySelectorAll('.btn-back').forEach(b=>b.textContent=l==='it'?'← Indietro':'← Back');
+  if(document.getElementById('app-screen').style.display!=='none'){renderGrid();applyAll();}
+  if(document.getElementById('sresult').classList.contains('active'))showResult();
+}
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeM();});
+</script>
+</body>
+</html>
